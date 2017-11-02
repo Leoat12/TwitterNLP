@@ -12,97 +12,16 @@ namespace TwitterNLP
 {
     class DBConnection
     {
-        private string connectionstringSQLServer;
         private string connectionstringMySQL;
-        private string connectionstringMySQL2;
 
         public DBConnection()
         {
-            connectionstringSQLServer = "Data Source=twitterdb.ccj3d9slsftz.us-east-2.rds.amazonaws.com;Initial Catalog=TweetsDB;Persist Security Info=True;User ID=leo;Password=2glo1gg4";
             connectionstringMySQL = "server=devtestdb.ccj3d9slsftz.us-east-2.rds.amazonaws.com;user=leoat12;database=tweetsdb;port=3306;password=2glo1gg4";
-            connectionstringMySQL2 = "server=ec2-18-220-57-113.us-east-2.compute.amazonaws.com;user=leo;database=twitterdb;port=3306;password=2glo1gg4";
-        }
-
-        public bool AddToDB(Tweet tweet, Location location)
-        {
-
-            using (SqlConnection conn = new SqlConnection())
-            {
-                conn.ConnectionString = connectionstringSQLServer;
-
-
-                SqlCommand insertTweetCommand = new SqlCommand(
-                    "INSERT INTO Tweet (Id, CreatedById, Text, CreatedAt, Language) VALUES" +
-                    " (@Id, @CreatedById, @Text, @CreatedAt, @Language)"
-                    , conn);
-
-                insertTweetCommand.Parameters.AddWithValue("Id", tweet.Id);
-                insertTweetCommand.Parameters.AddWithValue("CreatedById", tweet.CreatedById);
-                insertTweetCommand.Parameters.AddWithValue("Text", tweet.Text);
-                insertTweetCommand.Parameters.AddWithValue("CreatedAt", tweet.CreatedAt);
-                insertTweetCommand.Parameters.AddWithValue("Language", tweet.Language);
-
-                SqlCommand insertLocationCommand = new SqlCommand(
-                    "INSERT INTO Location (TweetId, Longitude, Latitude, PlaceName) " +
-                    "VALUES (@TweetId, @Longitude, @Latitude, @PlaceName)", conn);
-
-                insertLocationCommand.Parameters.AddWithValue("TweetId", location.TweetId);
-                insertLocationCommand.Parameters.AddWithValue("Longitude", location.Longitude);
-                insertLocationCommand.Parameters.AddWithValue("Latitude", location.Latitude);
-                insertLocationCommand.Parameters.AddWithValue("PlaceName", location.PlaceName);
-
-                try
-                {
-                    conn.Open();
-                    insertTweetCommand.ExecuteNonQuery();
-                    insertLocationCommand.ExecuteNonQuery();
-                }
-                catch (SqlException er)
-                {
-                    Console.WriteLine("There was an error by SQL Server, " + er.Message);
-                    return false;
-                }
-
-                return true;
-            }
-        }
-
-        public bool AddToDB(Tweet tweet)
-        {
-            using (SqlConnection conn = new SqlConnection())
-            {
-                conn.ConnectionString = connectionstringSQLServer;
-
-
-                SqlCommand insertTweetCommand = new SqlCommand(
-                    "INSERT INTO Tweet (Id, CreatedById, Text, CreatedAt, Language) VALUES" +
-                    " (@Id, @CreatedById, @Text, @CreatedAt, @Language)"
-                    , conn);
-
-                insertTweetCommand.Parameters.AddWithValue("Id", tweet.Id);
-                insertTweetCommand.Parameters.AddWithValue("CreatedById", tweet.CreatedById);
-                insertTweetCommand.Parameters.AddWithValue("Text", tweet.Text);
-                insertTweetCommand.Parameters.AddWithValue("CreatedAt", tweet.CreatedAt);
-                insertTweetCommand.Parameters.AddWithValue("Language", tweet.Language);
-
-                try
-                {
-                    conn.Open();
-                    insertTweetCommand.ExecuteNonQuery();
-                }
-                catch (SqlException er)
-                {
-                    Console.WriteLine("There was an error by SQL Server, " + er.Message);
-                    return false;
-                }
-
-                return true;
-            }
         }
 
         public bool AddToMySQLDB(Tweet tweet)
         {
-            MySqlConnection conn = new MySqlConnection(connectionstringMySQL2);
+            MySqlConnection conn = new MySqlConnection(connectionstringMySQL);
 
             try
             {

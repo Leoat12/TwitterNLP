@@ -25,54 +25,33 @@ namespace TwitterNLP
             // Task insertToDB = Task.Factory.StartNew(() => InsertToMySQLFromFile());
             // Task.WaitAll(tweetStream, insertToDB);
 
+            Properties props = new Properties();
+            props.consumerKey = "jGiDDapHZqJNkll8fWwfHHPw6";
+            props.consumerSecret = "kMVomZ4XaRL3OeHDWxJSqyc0b0KiQY5ZnaX0UiUWhERJ3y8Szj";
+            props.userAccessToken = "285254601-jogp3oHoUUtynWyQMp1c8IYg83j4zEiPIYsDnX6B";
+            props.userAcessSecret = "N6YrrOAFP1SNdxXQZdX4jufRjOgArtvhlPwVmKDuXuijv";
+            props.profilesToSearch = new List<string>();
+            props.profilesToSearch.Add("OperacoesRio");
+            props.profilesToSearch.Add("LinhaAmarelaRJ");
+            props.boundingBoxBottomLeft = new Coordinates(-23.076889, -43.761292);
+            props.boundingBoxTopRight = new Coordinates(-22.742306, -43.091125);
+            props.filterLevel = StreamFilterLevel.None;
+            props.jsonCache = 5000;
+            props.timeLimit = 15;
+            props.tweetCountLimit = 200000;
+            props.dbCommunityString = "server=devtestdb.ccj3d9slsftz.us-east-2.rds.amazonaws.com;user=leoat12;database=tweetsdb;port=3306;password=2glo1gg4";
+
+            string newJson = JsonConvert.SerializeObject(props, Formatting.Indented);
+            System.IO.File.WriteAllText(@"data\props_teste.json", newJson);
+
+            string json = System.IO.File.ReadAllText(@"data\props_teste.json");
+            Properties props1 = JsonConvert.DeserializeObject<Properties>(json);
+
+
+
             Console.WriteLine("Done");
             
             return;
-        }
-
-        static void AuthUsersFeatures()
-        {
-            var appCredentials = new TwitterCredentials("jGiDDapHZqJNkll8fWwfHHPw6", "kMVomZ4XaRL3OeHDWxJSqyc0b0KiQY5ZnaX0UiUWhERJ3y8Szj");
-
-            var authenticationContext = AuthFlow.InitAuthentication(appCredentials);
-
-            Process.Start(authenticationContext.AuthorizationURL);
-
-            System.Console.WriteLine("Please insert the PIN code received on the browser");
-            var pinCode = Console.ReadLine();
-
-            var userCredentials = AuthFlow.CreateCredentialsFromVerifierCode(pinCode, authenticationContext);
-
-            Auth.SetCredentials(userCredentials);
-
-            var authenticatedUser = User.GetAuthenticatedUser();
-
-            // var accountSettings = authenticatedUser.GetAccountSettings();
-
-            string tweets = authenticatedUser.GetHomeTimeline().ToJson();
-
-            System.IO.File.WriteAllText(@"C:\Tweetfile.txt", tweets);
-
-            //System.Console.WriteLine(accountSettings.ScreenName);
-
-            Console.WriteLine("Done");
-            System.Console.ReadLine();
-
-        }
-
-        static void UsersFeatures()
-        {
-            var credentials = Auth.SetUserCredentials("jGiDDapHZqJNkll8fWwfHHPw6", "kMVomZ4XaRL3OeHDWxJSqyc0b0KiQY5ZnaX0UiUWhERJ3y8Szj", "285254601-jogp3oHoUUtynWyQMp1c8IYg83j4zEiPIYsDnX6B", "N6YrrOAFP1SNdxXQZdX4jufRjOgArtvhlPwVmKDuXuijv");
-
-            var user = User.GetUserFromScreenName("Leo_at12");
-            var user1Identifier = new UserIdentifier("Leo_at12");
-            var user2Identifier = new UserIdentifier("wiru46");
-
-            var relationshipDetails = Friendship.GetRelationshipDetailsBetween(user1Identifier, user2Identifier);
-
-            System.Console.WriteLine(relationshipDetails.Following);
-            System.Console.WriteLine(relationshipDetails.FollowedBy);
-            System.Console.ReadLine();
         }
 
         static void SearchFeatures()
@@ -125,19 +104,6 @@ namespace TwitterNLP
             {
                 System.Console.WriteLine("API Error or Empty Search");
             }
-        }
-
-        static void StreamFeatures()
-        {
-            Auth.SetUserCredentials("jGiDDapHZqJNkll8fWwfHHPw6", "kMVomZ4XaRL3OeHDWxJSqyc0b0KiQY5ZnaX0UiUWhERJ3y8Szj", "285254601-jogp3oHoUUtynWyQMp1c8IYg83j4zEiPIYsDnX6B", "N6YrrOAFP1SNdxXQZdX4jufRjOgArtvhlPwVmKDuXuijv");
-
-            var stream = Tweetinvi.Stream.CreateUserStream();
-            stream.TweetCreatedByMe += (sender, args) =>
-            {
-                Console.WriteLine(args.Tweet.FullText);
-            };
-            Console.WriteLine("Stream began.");
-            stream.StartStream();
         }
 
         static void FilteredStreamFeatures()
