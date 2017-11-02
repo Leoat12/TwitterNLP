@@ -1,6 +1,9 @@
 using System;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.Diagnostics;
+using System.IO;
+using System.Threading;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
@@ -12,11 +15,13 @@ namespace TwitterNLP
 {
     class DBConnection
     {
-        private string connectionstringMySQL;
+        private readonly string connectionstringMySQL; 
+        private readonly int timeLimit;
 
-        public DBConnection()
+        public DBConnection(string connectionstring, int timeLimit)
         {
-            connectionstringMySQL = "server=devtestdb.ccj3d9slsftz.us-east-2.rds.amazonaws.com;user=leoat12;database=tweetsdb;port=3306;password=2glo1gg4";
+            connectionstringMySQL = connectionstring;
+            this.timeLimit = timeLimit;
         }
 
         public bool AddToMySQLDB(Tweet tweet)
@@ -50,6 +55,41 @@ namespace TwitterNLP
 
             conn.Close();
             return true;
+        }
+
+        public void InsertToMySQLFromFile()
+        {
+            int file_number = 0;
+            Stopwatch ws = new Stopwatch();
+            ws.Start();
+
+            while (ws.Elapsed.Hours < 15 || Directory.GetFiles(@".\data").Length > 0)
+            {
+                string path = @".\data\tweets_" + file_number + ".json";
+                if (System.IO.File.Exists(path))
+                {
+
+                    string json = System.IO.File.ReadAllText(path);
+                    List<Tweet> tweets = JsonConvert.DeserializeObject<List<Tweet>>(json);
+                    List<Tweet> cleanedtweets = new List<Tweet>();
+                    foreach (Tweet tweet in tweets)
+                    {
+                        tweet.Text = TweetFormatter.TreatTweet(tweet.Text);
+                        cleanedtweets.Add(tweet);
+                    }
+
+                    if (this.BulkyInsert(cleanedtweets))
+                    {
+                        file_number++;
+                        System.IO.File.Delete(path);
+                    }
+                }
+                else
+                {
+                    TimeSpan ts = new TimeSpan(0, 30, 0);
+                    Thread.Sleep(ts);
+                }
+            }
         }
 
         public bool ExistsEntry(long Id)
