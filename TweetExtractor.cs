@@ -1,5 +1,4 @@
 using System;
-
 using System.Collections.Generic;
 using System.Diagnostics;
 using Tweetinvi;
@@ -21,13 +20,13 @@ namespace TwitterNLP
            this.props = props; 
        }
 
-        public void SearchFeatures()
+        public void SearchFeatures(List<string> profiles)
         {
             Auth.SetUserCredentials(props.consumerKey, props.consumerSecret, props.userAccessToken, props.userAcessSecret);
 
             string path = @"data\TweetsCanalOficial.json";
 
-            string query = BuildSearchQuery();
+            string query = BuildSearchQuery(profiles);
             var matchingTweets = Search.SearchTweets(query);
 
             if(matchingTweets != null)
@@ -73,8 +72,7 @@ namespace TwitterNLP
             }
         }
 
-        public string BuildSearchQuery(){
-            List<string> profiles = props.profilesToSearch;
+        private string BuildSearchQuery(List<string> profiles){
             string query = "";
             for(int i = 0; i < profiles.Count; i++){
                 if(i != profiles.Count - 1){

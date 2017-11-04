@@ -145,12 +145,20 @@ namespace TwitterNLP
                             MySqlHelper.EscapeString(tweet.Text), tweet.CreatedAt.ToString("yyyy-MM-dd H:mm:ss")));
                     }
                 }
-                commandCord.Append(string.Join(",", rowsCords));
-                commandCord.Append(";");
-                commandNoCord.Append(string.Join(",", rowsNoCord));
-                commandNoCord.Append(";");
-
-                StringBuilder command = new StringBuilder(commandCord.Append(commandNoCord).ToString());
+                StringBuilder command;
+                if(rowsCords.Count > 0){
+                    commandCord.Append(string.Join(",", rowsCords));
+                    commandCord.Append(";");
+                    commandNoCord.Append(string.Join(",", rowsNoCord));
+                    commandNoCord.Append(";");
+                    command = new StringBuilder(commandCord.Append(commandNoCord).ToString());
+                }
+                else{
+                    commandNoCord.Append(string.Join(",", rowsNoCord));
+                    commandNoCord.Append(";");
+                    command = new StringBuilder(commandNoCord.ToString());
+                }
+                
                 conn.Open();
                 using (MySqlCommand myCmd = new MySqlCommand(command.ToString(), conn))
                 {
