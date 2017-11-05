@@ -20,7 +20,7 @@ namespace TwitterNLP{
         public int timeLimit { get; set; }
         public int tweetCountLimit { get; set; }
         public string dbCommunityString { get; set; }
-        public bool autoMode { get; set;}
+        //public bool autoMode { get; set;}
         //public bool useSearch{ get; set;}
         
         public Properties(){}
@@ -38,7 +38,6 @@ namespace TwitterNLP{
             timeLimit = props.timeLimit;
             tweetCountLimit = props.tweetCountLimit;
             dbCommunityString = props.dbCommunityString;
-            autoMode = props.autoMode;
         }
 
         public static void buildPropertiesFile(){
@@ -77,9 +76,7 @@ namespace TwitterNLP{
             
             System.Console.WriteLine("dbCommunityString\n");
             string dbCommunityString = Console.ReadLine();
-            
-            System.Console.WriteLine("autoMode (Default: False)\n");
-            string autoMode = Console.ReadLine();
+        
 
             if(!isEmpty(consumerKey)){
                 props.consumerKey = consumerKey;
@@ -143,13 +140,6 @@ namespace TwitterNLP{
 
             if(!isEmpty(dbCommunityString)){
                 props.dbCommunityString = dbCommunityString;
-            }
-
-            if(!isEmpty(autoMode) && autoMode.Equals("true", StringComparison.InvariantCultureIgnoreCase)){
-                props.autoMode = true;
-            }
-            else{
-                props.autoMode = false;
             }
         }
 

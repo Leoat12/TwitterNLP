@@ -281,7 +281,7 @@ namespace TwitterNLP
                     }
 
                     String newJson = JsonConvert.SerializeObject(tweets, Formatting.Indented);
-                    System.IO.File.WriteAllText(@".\tweets_" + start + "-" + end + ".json", newJson); 
+                    System.IO.File.WriteAllText(@"data\tweets_" + start + "-" + end + ".json", newJson); 
                     Console.WriteLine("Done reading...");
                     return true;
                 }

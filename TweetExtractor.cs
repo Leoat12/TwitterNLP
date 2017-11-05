@@ -24,7 +24,7 @@ namespace TwitterNLP
         {
             Auth.SetUserCredentials(props.consumerKey, props.consumerSecret, props.userAccessToken, props.userAcessSecret);
 
-            string path = @"data\TweetsCanalOficial.json";
+            string path = @"data\Tweets" + string.Join("_", profiles) + ".json";
 
             string query = BuildSearchQuery(profiles);
             var matchingTweets = Search.SearchTweets(query);
