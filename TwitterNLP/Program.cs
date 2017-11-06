@@ -57,18 +57,6 @@ namespace TwitterNLP
             else{
                 Console.WriteLine("Erro: Insira os parâmetros segundo a documentação.");
             }
-
-
-            // System.Console.WriteLine("Started");
-            // props = new Properties(@"data\props_teste.json");
-            // TweetExtractor te = new TweetExtractor(props);
-
-            // List<string> profiles = new List<string>{"OperacoesRio", "LinhaAmarelaRJ"};
-            // te.SearchFeatures(profiles);
-
-            // Console.WriteLine("Done");
-            
-            // return;
         }
 
         static void AutoModeCaller(){
