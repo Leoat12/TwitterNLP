@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterNLP", "TwitterNLP.csproj", "{9404C0C0-69AB-44E0-8068-1E61AA8DF635}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterNLP", "TwitterNLP\TwitterNLP.csproj", "{9404C0C0-69AB-44E0-8068-1E61AA8DF635}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterNLP.Tests", "TwitterNLP.Tests\TwitterNLP.Tests.csproj", "{5DAD2167-1DD6-4444-AADA-E019C328838F}"
 EndProject

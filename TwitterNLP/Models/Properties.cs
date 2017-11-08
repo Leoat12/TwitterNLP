@@ -12,7 +12,6 @@ namespace TwitterNLP{
         public string consumerSecret { get; set; }
         public string userAccessToken { get; set; }
         public string userAcessSecret { get; set; }
-        //public List<string> profilesToSearch { get; set; }
         public Coordinates boundingBoxBottomLeft { get; set; }
         public Coordinates boundingBoxTopRight { get; set; }
         public StreamFilterLevel filterLevel { get; set; }
@@ -20,8 +19,7 @@ namespace TwitterNLP{
         public int timeLimit { get; set; }
         public int tweetCountLimit { get; set; }
         public string dbCommunityString { get; set; }
-        //public bool autoMode { get; set;}
-        //public bool useSearch{ get; set;}
+        public int dbInsertSleepTime{ get; set; }
         
         public Properties(){}
         public Properties(string path){
@@ -38,6 +36,7 @@ namespace TwitterNLP{
             timeLimit = props.timeLimit;
             tweetCountLimit = props.tweetCountLimit;
             dbCommunityString = props.dbCommunityString;
+            dbInsertSleepTime = props.dbInsertSleepTime;
         }
 
         public static void buildPropertiesFile(){
@@ -76,6 +75,9 @@ namespace TwitterNLP{
             
             System.Console.WriteLine("dbCommunityString\n");
             string dbCommunityString = Console.ReadLine();
+
+            System.Console.WriteLine("dbInsertSleepTime");
+            string dbInsertSleepTime = Console.ReadLine();
         
 
             if(!isEmpty(consumerKey)){
@@ -140,6 +142,10 @@ namespace TwitterNLP{
 
             if(!isEmpty(dbCommunityString)){
                 props.dbCommunityString = dbCommunityString;
+            }
+
+            if(!isEmpty(dbInsertSleepTime) && Int32.TryParse(dbInsertSleepTime, out number)){
+                props.dbInsertSleepTime = number;
             }
         }
 

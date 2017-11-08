@@ -17,11 +17,13 @@ namespace TwitterNLP
     {
         private readonly string connectionstringMySQL; 
         private readonly int timeLimit;
+        private readonly int dbInsertSleepTime;
 
-        public DBConnection(string connectionstring, int timeLimit)
+        public DBConnection(string connectionstring, int timeLimit, int dbInsertSleepTime)
         {
             connectionstringMySQL = connectionstring;
             this.timeLimit = timeLimit;
+            this.dbInsertSleepTime = dbInsertSleepTime;
         }
 
         public bool AddToMySQLDB(Tweet tweet)
@@ -63,9 +65,9 @@ namespace TwitterNLP
             Stopwatch ws = new Stopwatch();
             ws.Start();
 
-            while (ws.Elapsed.Hours < 15 || Directory.GetFiles(@".\data").Length > 0)
+            while (ws.Elapsed.Hours < timeLimit || Directory.GetFiles(@"data").Length > 0)
             {
-                string path = @".\data\tweets_" + file_number + ".json";
+                string path = @"data\tweets_" + file_number + ".json";
                 if (System.IO.File.Exists(path))
                 {
 
@@ -86,7 +88,7 @@ namespace TwitterNLP
                 }
                 else
                 {
-                    TimeSpan ts = new TimeSpan(0, 30, 0);
+                    TimeSpan ts = new TimeSpan(0, dbInsertSleepTime, 0);
                     Thread.Sleep(ts);
                 }
             }

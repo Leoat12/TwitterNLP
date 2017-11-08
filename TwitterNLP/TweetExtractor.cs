@@ -24,7 +24,7 @@ namespace TwitterNLP
         {
             Auth.SetUserCredentials(props.consumerKey, props.consumerSecret, props.userAccessToken, props.userAcessSecret);
 
-            string path = @"data\Tweets" + string.Join("_", profiles) + ".json";
+            string path = @"data\Tweets_" + string.Join("_", profiles) + ".json";
 
             string query = BuildSearchQuery(profiles);
             var matchingTweets = Search.SearchTweets(query);
@@ -118,6 +118,7 @@ namespace TwitterNLP
                 tweet.Language = args.Tweet.Language.ToString();
                 tweet.Longitude = args.Tweet.Coordinates != null ? (double?)args.Tweet.Coordinates.Longitude : null;
                 tweet.Latitude = args.Tweet.Coordinates != null ? (double?)args.Tweet.Coordinates.Latitude : null;
+                //Messenger.SendTweet(tweet);
                 tweets.Add(tweet);
 
                 if (tweet_count % props.jsonCache == 0)

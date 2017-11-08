@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
@@ -12,58 +13,14 @@ namespace TwitterNLP
         static private Properties props;
         static void Main(string[] args)
         {
-            if(args.Length > 0 ){
-                if(args[0].Equals("-a")){
-                    if(args.Length > 2){
-                        if(args[1].Equals("-p") && !args[2].Equals("")){
-                            props = new Properties(args[2]);
-                            Console.WriteLine("Starting auto-mode...\n");
-                            AutoModeCaller();
-                        }
-                        else{
-                            Console.WriteLine("Indique o arquivo de propriedades usando -p <FilePath>");
-                        }   
-                    }
-                    else{
-                        Console.WriteLine("Indique o arquivo de propriedades usando -p <FilePath>");
-                    }
-                }
-                else if(args[0].Equals("-m")){
-                    if(args.Length > 2){
-                        if(args[1].Equals("-p") && !args[2].Equals("")){
-                            props = new Properties(args[2]);
-                            Console.WriteLine("Starting manual-mode...\n");
-                            ManualModeCaller();
-                        }
-                        else{
-                        Console.WriteLine("Indique o arquivo de propriedades usando -p <FilePath>");
-                        }
-                    }
-                    else{
-                        Console.WriteLine("É necessário um arquivo de propriedades, deseja criar um agora? [S/N]");
-                        string option = Console.ReadLine();
-                        if(option.Equals("s", StringComparison.InvariantCultureIgnoreCase)){
-                            Properties.buildPropertiesFile();
-                        }
-                        else if(option.Equals("n", StringComparison.InvariantCultureIgnoreCase)){
-                            return;
-                        }
-                        else{
-                            Console.WriteLine("Opção invalida, tente novamete.");
-                        }
-                    }  
-                }
-            }
-            else{
-                Console.WriteLine("Erro: Insira os parâmetros segundo a documentação.");
-            }
+            argsHandler(args);
         }
 
         static void AutoModeCaller(){
 
             if(VerifyPropsForAutoMode()){
                 TweetExtractor te = new TweetExtractor(props);
-                DBConnection dc = new DBConnection(props.dbCommunityString, props.timeLimit);
+                DBConnection dc = new DBConnection(props.dbCommunityString, props.timeLimit, props.dbInsertSleepTime);
 
                 Task tweetStream = Task.Factory.StartNew(() => te.FilteredStreamFeatures());
                 Task insertToDB = Task.Factory.StartNew(() => dc.InsertToMySQLFromFile());
@@ -91,7 +48,7 @@ namespace TwitterNLP
 
         static void ManualModeCaller(){
             TweetExtractor te = new TweetExtractor(props);
-            DBConnection dc = new DBConnection(props.dbCommunityString, props.timeLimit);
+            DBConnection dc = new DBConnection(props.dbCommunityString, props.timeLimit, props.dbInsertSleepTime);
             Console.WriteLine("Bem-vindo ao modo manual.\nEscolha a opção desejada.\n");
             while(true){
                 Console.WriteLine(
@@ -140,6 +97,66 @@ namespace TwitterNLP
                 else{
                     Console.WriteLine("Opção inválida. Tente novamente.");
                 }
+            }
+        }
+
+        static void argsHandler(string[] args){
+            if(args.Length > 0 ){
+                if(args[0].Equals("-a")){
+                    if(args.Length > 2){
+                        if(args[1].Equals("-p") && !args[2].Equals("")){
+                            if(File.Exists(args[2])){
+                            props = new Properties(args[2]);
+                            }
+                            else{
+                                Console.WriteLine("Arquivo de propriedade inexistente.");
+                                return;
+                            }
+                            Console.WriteLine("Starting auto-mode...\n");
+                            AutoModeCaller();
+                        }
+                        else{
+                            Console.WriteLine("Indique o arquivo de propriedades usando -p <FilePath>");
+                        }   
+                    }
+                    else{
+                        Console.WriteLine("Indique o arquivo de propriedades usando -p <FilePath>");
+                    }
+                }
+                else if(args[0].Equals("-m")){
+                    if(args.Length > 2){
+                        if(args[1].Equals("-p") && !args[2].Equals("")){
+                            if(File.Exists(args[2])){
+                            props = new Properties(args[2]);
+                            }
+                            else{
+                                Console.WriteLine("Arquivo de propriedade inexistente.");
+                                return;
+                            }
+                            Console.WriteLine("Starting manual-mode...\n");
+                            ManualModeCaller();
+                        }
+                        else{
+                        Console.WriteLine("Indique o arquivo de propriedades usando -p <FilePath>");
+                        }
+                    }
+                    else{
+                        Console.WriteLine("É necessário um arquivo de propriedades, deseja criar um agora? [S/N]");
+                        string option = Console.ReadLine();
+                        if(option.Equals("s", StringComparison.InvariantCultureIgnoreCase)){
+                            Properties.buildPropertiesFile();
+                        }
+                        else if(option.Equals("n", StringComparison.InvariantCultureIgnoreCase)){
+                            return;
+                        }
+                        else{
+                            Console.WriteLine("Opção invalida, tente novamete.");
+                        }
+                    }  
+                }
+            }
+            else{
+                Console.WriteLine("Erro: Insira os parâmetros segundo a documentação.");
             }
         }
     }
