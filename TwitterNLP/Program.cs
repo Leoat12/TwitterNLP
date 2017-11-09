@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 
 namespace TwitterNLP
 {
+    // Teste
     class Program
     {
         static private Properties props;
