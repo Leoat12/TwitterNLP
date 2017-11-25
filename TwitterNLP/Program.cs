@@ -23,8 +23,9 @@ namespace TwitterNLP
                 TweetExtractor te = new TweetExtractor(props);
                 DBConnection dc = new DBConnection(props.dbCommunityString, props.timeLimit, props.dbInsertSleepTime);
 
+                Task insertToDB = Task.Factory.StartNew(() => dc.InsertToMySQLFromMessenger());
                 Task tweetStream = Task.Factory.StartNew(() => te.FilteredStreamFeatures());
-                Task insertToDB = Task.Factory.StartNew(() => dc.InsertToMySQLFromFile());
+                
                 Task.WaitAll(tweetStream, insertToDB);
             }
             else{

@@ -130,7 +130,7 @@ namespace TwitterNLP{
                 props.timeLimit = number;  
             }
             else{
-                props.timeLimit = 100;
+                props.timeLimit = 1;
             }
 
             if(!isEmpty(tweetCountLimit) && Int32.TryParse(tweetCountLimit, out number)){

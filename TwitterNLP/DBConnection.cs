@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data;
 using Newtonsoft.Json;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 
 namespace TwitterNLP
 {
@@ -94,6 +96,43 @@ namespace TwitterNLP
             }
         }
 
+        public void InsertToMySQLFromMessenger(){
+            Stopwatch ws = new Stopwatch();
+            
+            var factory = new ConnectionFactory() { HostName = "localhost" };
+            using(var connection = factory.CreateConnection())
+            using(var channel = connection.CreateModel())
+            {
+                channel.QueueDeclare(queue: "db_queue",
+                                    durable: false,
+                                    exclusive: false,
+                                    autoDelete: false,
+                                    arguments: null);
+
+                ws.Start();
+                var consumer = new EventingBasicConsumer(channel);
+                consumer.Received += (model, ea) =>
+                {
+                    var body = ea.Body;
+                    var message = Encoding.UTF8.GetString(body);
+                    List<Tweet> tweets = JsonConvert.DeserializeObject<List<Tweet>>(message);
+                    BulkyInsert(tweets);
+                    if(ws.Elapsed.Hours >= timeLimit){
+                        ws.Stop();
+                        channel.BasicCancel(consumer.ConsumerTag);
+                    }
+                };
+                consumer.ConsumerCancelled += (model,ea) => {
+                    return;
+                };
+                channel.BasicConsume(queue: "db_queue",
+                                    autoAck: true,
+                                    consumer: consumer);
+
+                Console.ReadLine();
+            }
+        }
+
         public bool ExistsEntry(long Id)
         {
             MySqlConnection conn = new MySqlConnection(connectionstringMySQL);
@@ -128,8 +167,8 @@ namespace TwitterNLP
 
         public bool BulkyInsert(List<Tweet> tweets)
         {
-            StringBuilder commandCord = new StringBuilder("insert ignore into tweet(tweetid, createdbyid, body, createdat, latitude, longitude) values ");
-            StringBuilder commandNoCord = new StringBuilder("insert ignore into tweet(tweetid, createdbyid, body, createdat) values ");
+            StringBuilder commandCord = new StringBuilder("insert ignore into tweetteste(tweetid, createdbyid, body, createdat, latitude, longitude) values ");
+            StringBuilder commandNoCord = new StringBuilder("insert ignore into tweetteste(tweetid, createdbyid, body, createdat) values ");
             using (MySqlConnection conn = new MySqlConnection(connectionstringMySQL))
             {
                 List<string> rowsCords = new List<string>();

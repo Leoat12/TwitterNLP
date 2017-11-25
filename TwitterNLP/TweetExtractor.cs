@@ -96,7 +96,7 @@ namespace TwitterNLP
             List<Tweet> tweets = new List<Tweet>();
 
             int tweet_count = 0;
-            int file_number = 0;
+            //int file_number = 0;
             var stream = Tweetinvi.Stream.CreateFilteredStream();
             stream.AddLocation(props.boundingBoxBottomLeft, props.boundingBoxTopRight);
             stream.FilterLevel = props.filterLevel;
@@ -120,36 +120,31 @@ namespace TwitterNLP
                 tweet.Latitude = args.Tweet.Coordinates != null ? (double?)args.Tweet.Coordinates.Latitude : null;
                 tweets.Add(tweet);
                 tweet.Text = TweetFormatter.TreatTweet(tweet.Text);
-                Messenger.SendTweet(tweet);
+                //Messenger.SendTweet(tweet, "tweet");
                 
 
                 if (tweet_count % props.jsonCache == 0)
                 {
-                    string json = JsonConvert.SerializeObject(tweets, Formatting.Indented);
-                    string path = @"data\tweets_" + file_number + ".json";
-                    System.IO.File.AppendAllText(path, json);
+                    string json = JsonConvert.SerializeObject(tweets);
+                    Messenger.SendTweet(json, "db_queue");
                     tweets.Clear();
-                    file_number++;
                 }
 
                 if(props.timeLimit > 0){
                     if (ws.Elapsed.Hours == props.timeLimit)
                     {             
-                        string json = JsonConvert.SerializeObject(tweets, Formatting.Indented);
-                        string path = @"data\tweets_" + file_number + ".json";
-                        System.IO.File.AppendAllText(path, json);
-                        tweets.Clear();
+                        string json = JsonConvert.SerializeObject(tweets);
+                        Messenger.SendTweet(json, "db_queue");
                         stream.StopStream();
+                        
                     }
                 }
                 if(props.tweetCountLimit > 0){
                     if (tweet_count > props.tweetCountLimit)
                     {             
-                        string json = JsonConvert.SerializeObject(tweets, Formatting.Indented);
-                        string path = @"data\tweets_" + file_number + ".json";
-                        System.IO.File.AppendAllText(path, json);
-                        tweets.Clear();
-                        stream.StopStream();
+                        string json = JsonConvert.SerializeObject(tweets);
+                        Messenger.SendTweet(json, "db_queue");
+                        stream.StopStream(); 
                     }
                 }
             };
@@ -157,14 +152,14 @@ namespace TwitterNLP
             {
                 var exceptionThatCausedTheStreamToStop = args.Exception;
                 var twitterDisconnectMessage = args.DisconnectMessage;
-                System.IO.File.AppendAllText(@"data\log.txt", args.Exception.Message + "   " + args.DisconnectMessage);
+                System.IO.File.AppendAllText(@"data\log.txt", args.Exception.Message + "   " + args.DisconnectMessage + "\n");
                 Console.WriteLine(exceptionThatCausedTheStreamToStop);
                 Console.WriteLine(twitterDisconnectMessage);
             };
             Console.WriteLine("Stream started.");
             stream.StartStreamMatchingAllConditions();
             
-            System.IO.File.AppendAllText(@"data\log.txt", DateTime.Now.ToString() + " | " + "Tweets: " + tweet_count + " | " + ws.Elapsed.ToString());
+            System.IO.File.AppendAllText(@"data\log.txt", DateTime.Now.ToString() + " | " + "Tweets: " + tweet_count + " | " + ws.Elapsed.ToString() + "\n");
         }  
     }
 }
