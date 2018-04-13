@@ -98,15 +98,18 @@ namespace TwitterNLP
             int tweet_count = 0;
             //int file_number = 0;
             var stream = Tweetinvi.Stream.CreateFilteredStream();
-            stream.AddLocation(props.boundingBoxBottomLeft, props.boundingBoxTopRight);
+            //stream.AddLocation(props.boundingBoxBottomLeft, props.boundingBoxTopRight);
+            stream.AddFollow(226409689);
+            stream.AddFollow(188766141);
             stream.FilterLevel = props.filterLevel;
             Stopwatch ws = new Stopwatch();
             ws.Start();
+            double lastBDInstant = 0;
 
             stream.MatchingTweetReceived += (sender, args) =>
             {
                 tweet_count++;
-                Console.Clear();
+                //Console.Clear();
                 Console.WriteLine(tweet_count);
                 Console.WriteLine(ws.Elapsed.Hours + ":" + ws.Elapsed.Minutes);
 
@@ -120,27 +123,27 @@ namespace TwitterNLP
                 tweet.Latitude = args.Tweet.Coordinates != null ? (double?)args.Tweet.Coordinates.Latitude : null;
                 tweets.Add(tweet);
                 tweet.Text = TweetFormatter.TreatTweet(tweet.Text);
-                //Messenger.SendTweet(tweet, "tweet");
+                Messenger.SendTweet(tweet, "tweet");
                 
 
-                if (tweet_count % props.jsonCache == 0)
+                if (tweet_count % props.jsonCache == 0 || (ws.Elapsed.TotalMinutes - lastBDInstant > 5 && tweets.Count > 0))
                 {
+                    lastBDInstant = ws.Elapsed.TotalMinutes;
                     string json = JsonConvert.SerializeObject(tweets);
                     Messenger.SendTweet(json, "db_queue");
                     tweets.Clear();
                 }
 
                 if(props.timeLimit > 0){
-                    if (ws.Elapsed.Hours == props.timeLimit)
+                    if (ws.Elapsed.Hours >= props.timeLimit && !(tweets.Count == 0))
                     {             
                         string json = JsonConvert.SerializeObject(tweets);
                         Messenger.SendTweet(json, "db_queue");
                         stream.StopStream();
-                        
                     }
                 }
                 if(props.tweetCountLimit > 0){
-                    if (tweet_count > props.tweetCountLimit)
+                    if (tweet_count > props.tweetCountLimit  && !(tweets.Count == 0))
                     {             
                         string json = JsonConvert.SerializeObject(tweets);
                         Messenger.SendTweet(json, "db_queue");
@@ -155,6 +158,7 @@ namespace TwitterNLP
                 System.IO.File.AppendAllText(@"data\log.txt", args.Exception.Message + "   " + args.DisconnectMessage + "\n");
                 Console.WriteLine(exceptionThatCausedTheStreamToStop);
                 Console.WriteLine(twitterDisconnectMessage);
+                return;
             };
             Console.WriteLine("Stream started.");
             stream.StartStreamMatchingAllConditions();

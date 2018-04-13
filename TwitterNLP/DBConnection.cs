@@ -116,14 +116,17 @@ namespace TwitterNLP
                     var body = ea.Body;
                     var message = Encoding.UTF8.GetString(body);
                     List<Tweet> tweets = JsonConvert.DeserializeObject<List<Tweet>>(message);
-                    BulkyInsert(tweets);
+                    if(!BulkyInsert(tweets)){
+                        foreach(Tweet tweet in tweets){
+                            Console.WriteLine(tweet.toJson());
+                        }
+                    }
                     if(ws.Elapsed.Hours >= timeLimit){
                         ws.Stop();
                         channel.BasicCancel(consumer.ConsumerTag);
+                        channel.Dispose();
+                        return;
                     }
-                };
-                consumer.ConsumerCancelled += (model,ea) => {
-                    return;
                 };
                 channel.BasicConsume(queue: "db_queue",
                                     autoAck: true,
@@ -211,6 +214,8 @@ namespace TwitterNLP
                     catch (MySqlException e)
                     {
                         Console.WriteLine(e.Message);
+                        Console.WriteLine(e.InnerException);
+                        Console.WriteLine(command.ToString());
                         return false;
                     }
                 }
